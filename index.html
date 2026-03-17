@@ -1,0 +1,1720 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>移动端电商 App 原型（单页）</title>
+    <style>
+      :root{
+        --bg: #0b1220;
+        --panel: rgba(255,255,255,.06);
+        --panel-2: rgba(255,255,255,.08);
+        --text: rgba(255,255,255,.92);
+        --muted: rgba(255,255,255,.64);
+        --line: rgba(255,255,255,.12);
+        --brand: #7c5cff;
+        --brand-2: #2ee59d;
+        --danger: #ff4d4f;
+        --warn: #ffb020;
+        --ok: #35d07f;
+        --shadow: 0 18px 60px rgba(0,0,0,.45);
+        --shadow-2: 0 10px 30px rgba(0,0,0,.35);
+        --radius: 18px;
+        --radius-sm: 12px;
+        --phone-w: 375px;
+        --phone-h: 667px;
+        --nav-w: 200px;
+        --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC", sans-serif;
+      }
+
+      *{ box-sizing: border-box; }
+      html, body { height: 100%; }
+      body{
+        margin: 0;
+        font-family: var(--font);
+        color: var(--text);
+        background:
+          radial-gradient(1200px 800px at 15% 10%, rgba(124,92,255,.28), transparent 55%),
+          radial-gradient(1000px 700px at 85% 25%, rgba(46,229,157,.16), transparent 50%),
+          radial-gradient(900px 600px at 70% 85%, rgba(255,176,32,.12), transparent 55%),
+          linear-gradient(180deg, #070b14 0%, #0b1220 55%, #070b14 100%);
+        overflow: hidden;
+      }
+
+      .app{
+        height: 100%;
+        display: grid;
+        grid-template-columns: var(--nav-w) 1fr;
+      }
+
+      /* 左侧导航 */
+      .nav{
+        padding: 18px 14px;
+        border-right: 1px solid var(--line);
+        background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+        backdrop-filter: blur(12px);
+      }
+
+      .brand{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 10px 16px;
+      }
+      .brand-badge{
+        width: 36px; height: 36px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--brand), rgba(46,229,157,.8));
+        box-shadow: 0 10px 25px rgba(124,92,255,.25);
+      }
+      .brand h1{
+        font-size: 14px;
+        margin: 0;
+        letter-spacing: .3px;
+      }
+      .brand p{
+        margin: 0;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .nav-list{
+        list-style: none;
+        padding: 0;
+        margin: 8px 0 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .nav-item{
+        position: relative;
+        width: 100%;
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--text);
+        padding: 10px 10px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        text-align: left;
+        outline: none;
+        transition: transform .12s ease, background .15s ease, border-color .15s ease;
+      }
+      .nav-item:hover{
+        background: rgba(255,255,255,.06);
+        border-color: rgba(255,255,255,.08);
+      }
+      .nav-item:active{ transform: translateY(1px); }
+      .nav-item[aria-selected="true"]{
+        background: linear-gradient(135deg, rgba(124,92,255,.26), rgba(46,229,157,.10));
+        border-color: rgba(124,92,255,.28);
+        box-shadow: 0 10px 25px rgba(124,92,255,.14);
+      }
+      .nav-ico{
+        width: 30px; height: 30px;
+        border-radius: 10px;
+        display: grid; place-items: center;
+        background: rgba(255,255,255,.06);
+        border: 1px solid rgba(255,255,255,.08);
+        flex: 0 0 auto;
+      }
+      .nav-text{
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+      }
+      .nav-text span{ font-size: 13px; }
+      .nav-text small{
+        font-size: 11px;
+        color: var(--muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      /* 右侧手机区域 */
+      .stage{
+        height: 100%;
+        display: grid;
+        place-items: center;
+        padding: 20px;
+      }
+
+      .phone-shell{
+        width: min(96%, calc(var(--phone-w) + 110px));
+        height: min(96%, calc(var(--phone-h) + 120px));
+        display: grid;
+        place-items: center;
+        position: relative;
+      }
+      .phone-glow{
+        position: absolute;
+        inset: 0;
+        border-radius: 38px;
+        background:
+          radial-gradient(350px 240px at 50% 18%, rgba(124,92,255,.28), transparent 55%),
+          radial-gradient(330px 250px at 45% 90%, rgba(46,229,157,.18), transparent 60%),
+          radial-gradient(380px 280px at 90% 65%, rgba(255,176,32,.12), transparent 60%);
+        filter: blur(18px);
+        opacity: .95;
+      }
+
+      .phone{
+        width: var(--phone-w);
+        height: var(--phone-h);
+        border-radius: 34px;
+        background: rgba(255,255,255,.06);
+        border: 1px solid rgba(255,255,255,.18);
+        box-shadow: var(--shadow);
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(14px);
+      }
+      .phone::before{
+        content:"";
+        position: absolute;
+        inset: 0;
+        border-radius: 34px;
+        background:
+          radial-gradient(500px 350px at 30% -10%, rgba(255,255,255,.12), transparent 60%),
+          radial-gradient(480px 360px at 100% 40%, rgba(255,255,255,.08), transparent 62%);
+        pointer-events: none;
+      }
+
+      .statusbar{
+        position: relative;
+        height: 28px;
+        padding: 10px 14px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: rgba(255,255,255,.82);
+        font-size: 12px;
+        z-index: 2;
+      }
+      .sb-right{
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        opacity: .95;
+      }
+      .pill{
+        height: 10px;
+        width: 22px;
+        border-radius: 999px;
+        background: rgba(255,255,255,.2);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,.18);
+      }
+      .pill::after{
+        content:"";
+        position: absolute;
+        inset: 1px;
+        width: 65%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--brand), rgba(46,229,157,.9));
+      }
+
+      .topbar{
+        position: relative;
+        z-index: 2;
+        padding: 10px 14px 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-bottom: 1px solid rgba(255,255,255,.10);
+        background: linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.02));
+      }
+      .title{
+        font-weight: 700;
+        letter-spacing: .2px;
+        font-size: 14px;
+      }
+      .search{
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: 999px;
+        background: rgba(255,255,255,.07);
+        border: 1px solid rgba(255,255,255,.10);
+        color: rgba(255,255,255,.78);
+        min-width: 160px;
+      }
+      .search input{
+        width: 100%;
+        border: 0;
+        outline: none;
+        background: transparent;
+        color: rgba(255,255,255,.92);
+        font-size: 12px;
+      }
+      .search input::placeholder{ color: rgba(255,255,255,.55); }
+
+      .screen{
+        position: relative;
+        height: calc(var(--phone-h) - 28px - 52px);
+        padding: 12px 14px 14px;
+        overflow: hidden;
+      }
+      .screen-scroll{
+        height: 100%;
+        overflow: auto;
+        padding-right: 6px;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255,255,255,.18) transparent;
+      }
+      .screen-scroll::-webkit-scrollbar{ width: 8px; }
+      .screen-scroll::-webkit-scrollbar-thumb{
+        background: rgba(255,255,255,.18);
+        border-radius: 999px;
+        border: 2px solid transparent;
+        background-clip: padding-box;
+      }
+
+      /* 页面切换动画容器 */
+      .page-stack{
+        position: relative;
+        min-height: 100%;
+      }
+      .page{
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transform: translateX(10px);
+        pointer-events: none;
+        transition: opacity .22s ease, transform .22s ease;
+      }
+      .page.is-active{
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+      }
+
+      /* 通用卡片/按钮 */
+      .card{
+        background: rgba(255,255,255,.06);
+        border: 1px solid rgba(255,255,255,.10);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-2);
+      }
+      .btn{
+        border: 1px solid rgba(255,255,255,.16);
+        background: rgba(255,255,255,.08);
+        color: var(--text);
+        padding: 10px 12px;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: transform .12s ease, background .15s ease, border-color .15s ease;
+        user-select: none;
+        font-size: 12px;
+      }
+      .btn:hover{ background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.20); }
+      .btn:active{ transform: translateY(1px); }
+      .btn.primary{
+        background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(46,229,157,.85));
+        border-color: rgba(255,255,255,.16);
+        color: #0b1220;
+        font-weight: 700;
+      }
+      .btn.danger{
+        background: rgba(255,77,79,.16);
+        border-color: rgba(255,77,79,.22);
+        color: rgba(255,255,255,.92);
+      }
+      .tag{
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,.12);
+        background: rgba(255,255,255,.06);
+        color: rgba(255,255,255,.84);
+      }
+      .tag.dot::before{
+        content:"";
+        width: 7px; height: 7px;
+        border-radius: 99px;
+        background: rgba(255,255,255,.6);
+      }
+      .tag.ok.dot::before{ background: var(--ok); }
+      .tag.warn.dot::before{ background: var(--warn); }
+      .tag.brand.dot::before{ background: var(--brand); }
+      .tag.muted.dot::before{ background: rgba(255,255,255,.45); }
+
+      /* 首页 */
+      .hero{
+        padding: 12px;
+        border-radius: 18px;
+        overflow: hidden;
+        position: relative;
+      }
+      .carousel{
+        position: relative;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,.12);
+        background: rgba(0,0,0,.12);
+      }
+      .carousel-track{
+        display: flex;
+        transition: transform .35s ease;
+        will-change: transform;
+      }
+      .slide{
+        min-width: 100%;
+        height: 160px;
+        display: grid;
+        place-items: center;
+        position: relative;
+        color: rgba(255,255,255,.92);
+      }
+      .slide .slide-caption{
+        position: absolute;
+        left: 12px;
+        bottom: 12px;
+        right: 12px;
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .slide .slide-caption strong{
+        font-size: 13px;
+        letter-spacing: .2px;
+      }
+      .slide .slide-caption span{
+        font-size: 11px;
+        color: rgba(255,255,255,.74);
+      }
+      .carousel-controls{
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      .carousel-btn{
+        pointer-events: auto;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,.14);
+        background: rgba(0,0,0,.28);
+        color: rgba(255,255,255,.9);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        transition: background .15s ease, transform .12s ease;
+      }
+      .carousel-btn:hover{ background: rgba(0,0,0,.40); }
+      .carousel-btn:active{ transform: translateY(-50%) scale(.98); }
+      .carousel-btn.prev{ left: 10px; }
+      .carousel-btn.next{ right: 10px; }
+
+      .dots{
+        position: absolute;
+        left: 0; right: 0; bottom: 10px;
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        pointer-events: auto;
+      }
+      .dot{
+        width: 7px; height: 7px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,.28);
+        background: rgba(255,255,255,.12);
+        cursor: pointer;
+        transition: transform .12s ease, background .15s ease;
+      }
+      .dot[aria-selected="true"]{
+        background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(46,229,157,.85));
+        border-color: rgba(255,255,255,.22);
+        transform: scale(1.1);
+      }
+
+      .section{
+        margin-top: 12px;
+      }
+      .section-head{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 6px 2px 10px;
+      }
+      .section-head h3{
+        margin: 0;
+        font-size: 13px;
+        letter-spacing: .2px;
+      }
+      .section-head a{
+        color: rgba(255,255,255,.75);
+        text-decoration: none;
+        font-size: 12px;
+      }
+      .section-head a:hover{ color: rgba(255,255,255,.92); }
+
+      .cat-grid{
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+      }
+      .cat{
+        padding: 10px 8px;
+        border-radius: 16px;
+        background: rgba(255,255,255,.06);
+        border: 1px solid rgba(255,255,255,.10);
+        display: grid;
+        place-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: transform .12s ease, background .15s ease, border-color .15s ease;
+      }
+      .cat:hover{ background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.14); }
+      .cat:active{ transform: translateY(1px); }
+      .cat .ico{
+        width: 30px; height: 30px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, rgba(124,92,255,.65), rgba(46,229,157,.35));
+        border: 1px solid rgba(255,255,255,.14);
+      }
+      .cat span{
+        font-size: 11px;
+        color: rgba(255,255,255,.86);
+      }
+
+      .product-grid{
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      .p-card{
+        padding: 10px;
+        border-radius: 18px;
+        background: rgba(255,255,255,.06);
+        border: 1px solid rgba(255,255,255,.10);
+        cursor: pointer;
+        transition: transform .12s ease, border-color .15s ease, background .15s ease;
+      }
+      .p-card:hover{ background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.14); }
+      .p-card:active{ transform: translateY(1px); }
+      .p-img{
+        width: 100%;
+        height: 92px;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,.12);
+        background: rgba(0,0,0,.10);
+      }
+      .p-img img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+      .p-name{
+        margin: 8px 0 6px;
+        font-size: 12px;
+        color: rgba(255,255,255,.90);
+        line-height: 1.2;
+        height: 28px;
+        overflow: hidden;
+      }
+      .p-meta{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .price{
+        font-weight: 800;
+        letter-spacing: .2px;
+        color: rgba(255,255,255,.95);
+      }
+      .price small{
+        font-weight: 700;
+        opacity: .9;
+      }
+
+      /* 商品分类页 */
+      .split{
+        display: grid;
+        grid-template-columns: 110px 1fr;
+        gap: 10px;
+        height: 100%;
+      }
+      .left-list{
+        padding: 10px;
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,.10);
+        background: rgba(255,255,255,.05);
+      }
+      .left-list button{
+        width: 100%;
+        padding: 10px 10px;
+        border-radius: 14px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: rgba(255,255,255,.86);
+        cursor: pointer;
+        text-align: left;
+        font-size: 12px;
+        transition: background .15s ease, border-color .15s ease, transform .12s ease;
+      }
+      .left-list button:hover{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.08); }
+      .left-list button:active{ transform: translateY(1px); }
+      .left-list button[aria-selected="true"]{
+        background: linear-gradient(135deg, rgba(124,92,255,.22), rgba(46,229,157,.10));
+        border-color: rgba(124,92,255,.24);
+        color: rgba(255,255,255,.95);
+      }
+
+      .right-panel{
+        padding: 10px;
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,.10);
+        background: rgba(255,255,255,.05);
+        min-width: 0;
+      }
+      .subhead{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .subhead h3{
+        margin: 0;
+        font-size: 13px;
+        letter-spacing: .2px;
+      }
+      .chip-row{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .chip{
+        padding: 8px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,.12);
+        background: rgba(255,255,255,.06);
+        font-size: 11px;
+        color: rgba(255,255,255,.82);
+        cursor: pointer;
+        transition: transform .12s ease, background .15s ease;
+      }
+      .chip:hover{ background: rgba(255,255,255,.08); }
+      .chip:active{ transform: translateY(1px); }
+
+      /* 购物车页 */
+      .cart-list{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .cart-item{
+        padding: 10px;
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,.10);
+        background: rgba(255,255,255,.06);
+        display: grid;
+        grid-template-columns: 64px 1fr;
+        gap: 10px;
+      }
+      .thumb{
+        width: 64px; height: 64px;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,.12);
+        background: rgba(0,0,0,.10);
+      }
+      .thumb img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+      .ci-main{ min-width: 0; }
+      .ci-title{
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        align-items: start;
+      }
+      .ci-title strong{
+        font-size: 12px;
+        color: rgba(255,255,255,.92);
+        line-height: 1.25;
+        max-width: 190px;
+      }
+      .ci-spec{
+        margin-top: 4px;
+        font-size: 11px;
+        color: rgba(255,255,255,.64);
+      }
+      .ci-bottom{
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .qty{
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 999px;
+        padding: 6px 8px;
+        border: 1px solid rgba(255,255,255,.12);
+        background: rgba(255,255,255,.05);
+      }
+      .qty button{
+        width: 26px; height: 26px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,.12);
+        background: rgba(255,255,255,.06);
+        color: rgba(255,255,255,.92);
+        cursor: pointer;
+        transition: transform .12s ease, background .15s ease;
+      }
+      .qty button:hover{ background: rgba(255,255,255,.09); }
+      .qty button:active{ transform: scale(.98); }
+      .qty span{
+        min-width: 18px;
+        text-align: center;
+        font-size: 12px;
+        color: rgba(255,255,255,.92);
+      }
+      .summary{
+        position: sticky;
+        bottom: 0;
+        margin-top: 12px;
+        padding: 10px;
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,.12);
+        background: linear-gradient(180deg, rgba(0,0,0,.12), rgba(0,0,0,.20));
+        backdrop-filter: blur(14px);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .summary .total{
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .summary .total small{ color: rgba(255,255,255,.62); font-size: 11px; }
+      .summary .total strong{ font-size: 14px; }
+
+      /* 订单页 */
+      .tabs{
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      .tab{
+        padding: 9px 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,.12);
+        background: rgba(255,255,255,.05);
+        color: rgba(255,255,255,.82);
+        cursor: pointer;
+        font-size: 11px;
+        transition: background .15s ease, transform .12s ease;
+      }
+      .tab:hover{ background: rgba(255,255,255,.08); }
+      .tab:active{ transform: translateY(1px); }
+      .tab[aria-selected="true"]{
+        background: linear-gradient(135deg, rgba(124,92,255,.22), rgba(46,229,157,.10));
+        border-color: rgba(124,92,255,.24);
+        color: rgba(255,255,255,.95);
+        font-weight: 700;
+      }
+      .order-list{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .order{
+        padding: 10px;
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,.10);
+        background: rgba(255,255,255,.06);
+      }
+      .order-head{
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .order-head small{
+        color: rgba(255,255,255,.62);
+        font-size: 11px;
+      }
+      .order-items{
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .mini{
+        width: 42px; height: 42px;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,.12);
+        background: rgba(0,0,0,.10);
+      }
+      .mini img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+      .order-foot{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+      }
+      .order-foot strong{ font-size: 13px; }
+
+      /* 个人中心 */
+      .profile{
+        padding: 12px;
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,.10);
+        background:
+          radial-gradient(400px 180px at 10% 10%, rgba(124,92,255,.20), transparent 55%),
+          radial-gradient(380px 190px at 90% 30%, rgba(46,229,157,.14), transparent 55%),
+          rgba(255,255,255,.05);
+      }
+      .profile-top{
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .avatar{
+        width: 52px;
+        height: 52px;
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,.16);
+        background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(46,229,157,.65));
+        box-shadow: 0 14px 30px rgba(124,92,255,.18);
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        color: #0b1220;
+      }
+      .profile-top strong{ display: block; font-size: 14px; }
+      .profile-top small{ color: rgba(255,255,255,.64); }
+      .quick{
+        margin-top: 12px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+      .quick .q{
+        padding: 10px;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,.10);
+        background: rgba(255,255,255,.06);
+        text-align: center;
+        cursor: pointer;
+        transition: transform .12s ease, background .15s ease;
+      }
+      .quick .q:hover{ background: rgba(255,255,255,.08); }
+      .quick .q:active{ transform: translateY(1px); }
+      .quick .q strong{ display: block; font-size: 12px; }
+      .quick .q small{ display: block; margin-top: 3px; font-size: 11px; color: rgba(255,255,255,.64); }
+
+      .menu{
+        margin-top: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .menu .row{
+        padding: 11px 12px;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,.10);
+        background: rgba(255,255,255,.06);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        cursor: pointer;
+        transition: background .15s ease, transform .12s ease;
+      }
+      .menu .row:hover{ background: rgba(255,255,255,.08); }
+      .menu .row:active{ transform: translateY(1px); }
+      .menu .row small{ color: rgba(255,255,255,.62); }
+
+      /* 小提示 */
+      .hint{
+        margin-top: 10px;
+        padding: 10px 12px;
+        border-radius: 16px;
+        border: 1px dashed rgba(255,255,255,.18);
+        background: rgba(0,0,0,.10);
+        color: rgba(255,255,255,.70);
+        font-size: 11px;
+        line-height: 1.35;
+      }
+
+      /* 自适应 */
+      @media (max-width: 900px){
+        body{ overflow: auto; }
+        .app{ grid-template-columns: 1fr; }
+        .nav{
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+        .nav-list{
+          flex-direction: row;
+          flex-wrap: wrap;
+        }
+        .nav-item{ width: calc(50% - 4px); }
+        .stage{ padding: 18px 12px 24px; }
+      }
+      @media (max-width: 430px){
+        :root{ --phone-w: 340px; --phone-h: 610px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="nav" aria-label="App 导航">
+        <div class="brand">
+          <div class="brand-badge" aria-hidden="true"></div>
+          <div>
+            <h1>电商 App 原型</h1>
+            <p>单页 · 原生 JS · 无刷新</p>
+          </div>
+        </div>
+
+        <ul class="nav-list" id="navList">
+          <li>
+            <button class="nav-item" data-route="home" aria-selected="true">
+              <span class="nav-ico" aria-hidden="true">🏠</span>
+              <span class="nav-text"><span>首页</span><small>轮播 / 分类 / 推荐</small></span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-item" data-route="category" aria-selected="false">
+              <span class="nav-ico" aria-hidden="true">🧩</span>
+              <span class="nav-text"><span>商品分类</span><small>一级 / 二级联动</small></span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-item" data-route="cart" aria-selected="false">
+              <span class="nav-ico" aria-hidden="true">🛒</span>
+              <span class="nav-text"><span>购物车</span><small>增减 / 删除 / 合计</small></span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-item" data-route="orders" aria-selected="false">
+              <span class="nav-ico" aria-hidden="true">📦</span>
+              <span class="nav-text"><span>我的订单</span><small>状态筛选</small></span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-item" data-route="me" aria-selected="false">
+              <span class="nav-ico" aria-hidden="true">👤</span>
+              <span class="nav-text"><span>个人中心</span><small>头像 / 常用功能</small></span>
+            </button>
+          </li>
+        </ul>
+      </aside>
+
+      <main class="stage">
+        <div class="phone-shell" aria-label="手机模拟器">
+          <div class="phone-glow" aria-hidden="true"></div>
+
+          <section class="phone" role="application" aria-label="App 内容">
+            <div class="statusbar" aria-hidden="true">
+              <div id="sbTime">09:41</div>
+              <div class="sb-right">
+                <span>5G</span>
+                <span class="pill" title="电量"></span>
+              </div>
+            </div>
+
+            <div class="topbar">
+              <div class="title" id="pageTitle">首页</div>
+              <div class="search" title="搜索（演示用）">
+                <span aria-hidden="true">🔎</span>
+                <input id="searchInput" placeholder="搜索商品/店铺" />
+              </div>
+            </div>
+
+            <div class="screen">
+              <div class="screen-scroll" id="screenScroll">
+                <div class="page-stack">
+                  <!-- 首页 -->
+                  <div class="page is-active" data-page="home">
+                    <div class="hero card">
+                      <div class="carousel" id="carousel">
+                        <div class="carousel-track" id="carouselTrack">
+                          <!-- JS 注入 slides -->
+                        </div>
+                        <div class="carousel-controls" aria-hidden="true">
+                          <button class="carousel-btn prev" id="prevBtn" aria-label="上一张">‹</button>
+                          <button class="carousel-btn next" id="nextBtn" aria-label="下一张">›</button>
+                          <div class="dots" id="dots" aria-label="轮播指示器"></div>
+                        </div>
+                      </div>
+
+                      <div class="section">
+                        <div class="section-head">
+                          <h3>分类入口</h3>
+                          <a href="javascript:void(0)" id="goCategory">去逛逛 →</a>
+                        </div>
+                        <div class="cat-grid" id="homeCats"></div>
+                      </div>
+
+                      <div class="section">
+                        <div class="section-head">
+                          <h3>热门推荐</h3>
+                          <a href="javascript:void(0)" id="shuffleHot">换一批</a>
+                        </div>
+                        <div class="product-grid" id="hotGrid"></div>
+                      </div>
+                    </div>
+
+                    <div class="hint">
+                      提示：左侧导航可切换页面；轮播支持自动播放/按钮/圆点；购物车支持数量增减与删除；订单支持状态筛选。
+                    </div>
+                  </div>
+
+                  <!-- 商品分类页 -->
+                  <div class="page" data-page="category">
+                    <div class="split">
+                      <div class="left-list" id="primaryCats" aria-label="一级分类"></div>
+                      <div class="right-panel">
+                        <div class="subhead">
+                          <h3 id="catTitle">分类</h3>
+                          <span class="tag brand dot" id="catCount">0</span>
+                        </div>
+                        <div class="chip-row" id="subCats" aria-label="二级分类/推荐"></div>
+                        <div class="section" style="margin-top: 10px;">
+                          <div class="section-head">
+                            <h3>该分类推荐</h3>
+                            <a href="javascript:void(0)" id="addRandomToCart">随机加购</a>
+                          </div>
+                          <div class="product-grid" id="catProducts"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 购物车页 -->
+                  <div class="page" data-page="cart">
+                    <div class="cart-list" id="cartList"></div>
+                    <div class="summary">
+                      <div class="total">
+                        <small>合计（不含运费）</small>
+                        <strong id="cartTotal">¥0.00</strong>
+                      </div>
+                      <button class="btn primary" id="checkoutBtn">去结算</button>
+                    </div>
+                  </div>
+
+                  <!-- 我的订单页 -->
+                  <div class="page" data-page="orders">
+                    <div class="tabs" id="orderTabs" aria-label="订单状态"></div>
+                    <div class="order-list" id="orderList"></div>
+                  </div>
+
+                  <!-- 个人中心 -->
+                  <div class="page" data-page="me">
+                    <div class="profile">
+                      <div class="profile-top">
+                        <div class="avatar" id="avatar">U</div>
+                        <div>
+                          <strong id="nickname">云上买买</strong>
+                          <small>会员等级：银卡 · 成长值 1280</small>
+                        </div>
+                      </div>
+                      <div class="quick">
+                        <div class="q">
+                          <strong>优惠券</strong><small id="couponCount">6 张</small>
+                        </div>
+                        <div class="q">
+                          <strong>收藏夹</strong><small>12 件</small>
+                        </div>
+                        <div class="q">
+                          <strong>足迹</strong><small>最近浏览</small>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="menu" aria-label="常用功能">
+                      <div class="row"><span>我的优惠券</span><small>查看 →</small></div>
+                      <div class="row"><span>收货地址</span><small>管理 →</small></div>
+                      <div class="row"><span>设置</span><small>偏好 →</small></div>
+                    </div>
+
+                    <div class="hint">
+                      这里可继续扩展：登录态、消息中心、会员权益、售后入口等。
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      /**
+       * 这是一个纯前端单文件原型：
+       * - 左侧导航切换 route
+       * - 右侧手机区域以淡入+位移动画呈现页面
+       * - 首页轮播：自动播放/按钮/圆点
+       * - 分类页：一级分类切换，展示二级 chip + 推荐商品
+       * - 购物车：数量增减、删除、合计、结算提示
+       * - 订单：状态 tab 筛选
+       */
+
+      const $ = (sel, root = document) => root.querySelector(sel);
+      const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+      function money(n) {
+        return "¥" + Number(n).toFixed(2);
+      }
+
+      function nowTimeText() {
+        const d = new Date();
+        const hh = String(d.getHours()).padStart(2, "0");
+        const mm = String(d.getMinutes()).padStart(2, "0");
+        return `${hh}:${mm}`;
+      }
+
+      // 简易 SVG 占位图（离线可用）
+      function svgDataUrl({ w = 600, h = 400, c1 = "#7c5cff", c2 = "#2ee59d", title = "SALE", subtitle = "New Season", badge = "限时" }) {
+        const svg = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+            <defs>
+              <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="${c1}" stop-opacity="1"/>
+                <stop offset="1" stop-color="${c2}" stop-opacity="1"/>
+              </linearGradient>
+              <filter id="b" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="20"/>
+              </filter>
+            </defs>
+            <rect width="${w}" height="${h}" rx="28" fill="url(#g)"/>
+            <circle cx="${Math.round(w*0.22)}" cy="${Math.round(h*0.28)}" r="${Math.round(Math.min(w,h)*0.28)}" fill="rgba(255,255,255,.22)" filter="url(#b)"/>
+            <circle cx="${Math.round(w*0.82)}" cy="${Math.round(h*0.72)}" r="${Math.round(Math.min(w,h)*0.24)}" fill="rgba(0,0,0,.18)" filter="url(#b)"/>
+            <g font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial" fill="rgba(255,255,255,.92)">
+              <text x="34" y="${Math.round(h*0.40)}" font-size="${Math.round(h*0.18)}" font-weight="800" letter-spacing="2">${title}</text>
+              <text x="36" y="${Math.round(h*0.52)}" font-size="${Math.round(h*0.07)}" font-weight="600" opacity=".9">${subtitle}</text>
+              <g transform="translate(${w-140}, 30)">
+                <rect x="0" y="0" width="110" height="40" rx="18" fill="rgba(0,0,0,.22)" stroke="rgba(255,255,255,.22)"/>
+                <text x="55" y="27" font-size="16" font-weight="700" text-anchor="middle">${badge}</text>
+              </g>
+            </g>
+          </svg>
+        `.replace(/\s+/g, " ").trim();
+        return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+      }
+
+      function productImg(seed) {
+        const palettes = [
+          ["#7c5cff", "#2ee59d"],
+          ["#ffb020", "#7c5cff"],
+          ["#2ee59d", "#5ad7ff"],
+          ["#ff4d4f", "#ffb020"],
+          ["#9b6cff", "#35d07f"],
+        ];
+        const [c1, c2] = palettes[seed % palettes.length];
+        return svgDataUrl({
+          w: 600,
+          h: 420,
+          c1,
+          c2,
+          title: "Goods",
+          subtitle: "Designed for mobile",
+          badge: "推荐",
+        });
+      }
+
+      const state = {
+        route: "home",
+        categoryPrimaryId: "digital",
+        orderStatus: "all",
+        cart: [
+          { id: "p1", name: "轻量真无线耳机 · 降噪版", spec: "曜石黑 / 标准", price: 199, qty: 1, img: productImg(1) },
+          { id: "p3", name: "多功能通勤双肩包 · 防泼水", spec: "深灰 / 20L", price: 239, qty: 2, img: productImg(3) },
+        ],
+      };
+
+      const routes = {
+        home: { title: "首页" },
+        category: { title: "商品分类" },
+        cart: { title: "购物车" },
+        orders: { title: "我的订单" },
+        me: { title: "个人中心" },
+      };
+
+      // 首页数据
+      const homeCats = [
+        { id: "digital", label: "数码", icon: "📱" },
+        { id: "beauty", label: "美妆", icon: "💄" },
+        { id: "food", label: "食品", icon: "🍪" },
+        { id: "home", label: "家居", icon: "🛋️" },
+      ];
+
+      const products = [
+        { id: "p1", name: "轻量真无线耳机 · 降噪版", price: 199, img: productImg(1), primary: "digital" },
+        { id: "p2", name: "高刷护眼屏 · 10.9 英寸平板", price: 2299, img: productImg(2), primary: "digital" },
+        { id: "p3", name: "多功能通勤双肩包 · 防泼水", price: 239, img: productImg(3), primary: "home" },
+        { id: "p4", name: "氨基酸洁面 · 温和清爽", price: 79, img: productImg(4), primary: "beauty" },
+        { id: "p5", name: "手冲咖啡豆 · 中深烘焙", price: 68, img: productImg(5), primary: "food" },
+        { id: "p6", name: "智能氛围灯 · 16 色联动", price: 129, img: productImg(6), primary: "home" },
+        { id: "p7", name: "口红套装 · 雾面显色", price: 159, img: productImg(7), primary: "beauty" },
+        { id: "p8", name: "低糖曲奇 · 黄油香", price: 39, img: productImg(8), primary: "food" },
+      ];
+
+      const primaryCats = [
+        { id: "digital", label: "数码家电", subs: ["耳机音响", "手机配件", "智能穿戴", "电脑办公"] },
+        { id: "beauty", label: "美妆个护", subs: ["护肤", "彩妆", "香氛", "洗护"] },
+        { id: "food", label: "食品生鲜", subs: ["零食", "咖啡茶饮", "粮油", "速食"] },
+        { id: "home", label: "家居生活", subs: ["收纳", "灯具", "家纺", "厨房"] },
+      ];
+
+      const orderStatuses = [
+        { id: "all", label: "全部" },
+        { id: "pending_pay", label: "待付款" },
+        { id: "pending_ship", label: "待发货" },
+        { id: "pending_receive", label: "待收货" },
+        { id: "done", label: "已完成" },
+      ];
+
+      const orders = [
+        { id: "o1001", status: "pending_pay", amount: 278, items: ["p5", "p8"], time: "03-12 19:20" },
+        { id: "o1002", status: "pending_ship", amount: 199, items: ["p1"], time: "03-10 11:06" },
+        { id: "o1003", status: "pending_receive", amount: 2299, items: ["p2"], time: "03-06 15:42" },
+        { id: "o1004", status: "done", amount: 159, items: ["p7"], time: "02-28 09:18" },
+      ];
+
+      // 路由切换
+      function setRoute(route) {
+        if (!routes[route]) return;
+        state.route = route;
+
+        // 更新左侧导航选中态
+        $$("#navList .nav-item").forEach((btn) => {
+          const active = btn.dataset.route === route;
+          btn.setAttribute("aria-selected", String(active));
+        });
+
+        // 更新标题
+        $("#pageTitle").textContent = routes[route].title;
+
+        // 切换页面（无刷新）
+        $$(".page").forEach((p) => {
+          p.classList.toggle("is-active", p.dataset.page === route);
+        });
+
+        // 回到顶部（更像 App）
+        $("#screenScroll").scrollTo({ top: 0, behavior: "smooth" });
+
+        // 每个页面进入时的渲染（原型可扩展为懒加载）
+        if (route === "cart") renderCart();
+        if (route === "orders") renderOrders();
+        if (route === "category") renderCategory();
+      }
+
+      // 首页：轮播
+      const carouselState = {
+        index: 0,
+        timer: null,
+        slides: [
+          { title: "春季上新", sub: "全场券 · 叠加满减", badge: "热卖", img: svgDataUrl({ title: "SPRING", subtitle: "New arrivals", badge: "满减" }) },
+          { title: "数码精选", sub: "会员专享 · 24h 发货", badge: "会员", img: svgDataUrl({ c1: "#2ee59d", c2: "#5ad7ff", title: "DIGI", subtitle: "Member deals", badge: "专享" }) },
+          { title: "品质生活", sub: "家居好物 · 轻奢风", badge: "推荐", img: svgDataUrl({ c1: "#ffb020", c2: "#7c5cff", title: "LIFE", subtitle: "Home & living", badge: "上新" }) },
+        ],
+      };
+
+      function renderCarousel() {
+        const track = $("#carouselTrack");
+        track.innerHTML = "";
+        carouselState.slides.forEach((s, i) => {
+          const el = document.createElement("div");
+          el.className = "slide";
+          el.style.background = `url("${s.img}") center/cover no-repeat`;
+          el.innerHTML = `
+            <div class="slide-caption">
+              <div>
+                <strong>${s.title}</strong><br/>
+                <span>${s.sub}</span>
+              </div>
+              <span class="tag brand dot">${s.badge}</span>
+            </div>
+          `;
+          el.setAttribute("role", "group");
+          el.setAttribute("aria-label", `轮播第 ${i + 1} 张`);
+          track.appendChild(el);
+        });
+
+        const dots = $("#dots");
+        dots.innerHTML = "";
+        carouselState.slides.forEach((_, i) => {
+          const d = document.createElement("button");
+          d.className = "dot";
+          d.setAttribute("aria-label", `切换到第 ${i + 1} 张`);
+          d.setAttribute("aria-selected", String(i === carouselState.index));
+          d.addEventListener("click", () => goSlide(i, true));
+          dots.appendChild(d);
+        });
+
+        updateCarousel();
+      }
+
+      function updateCarousel() {
+        const track = $("#carouselTrack");
+        track.style.transform = `translateX(-${carouselState.index * 100}%)`;
+        $$("#dots .dot").forEach((d, i) => d.setAttribute("aria-selected", String(i === carouselState.index)));
+      }
+
+      function goSlide(nextIndex, userAction = false) {
+        const len = carouselState.slides.length;
+        carouselState.index = (nextIndex + len) % len;
+        updateCarousel();
+        if (userAction) restartAutoplay();
+      }
+
+      function autoplay() {
+        stopAutoplay();
+        carouselState.timer = setInterval(() => goSlide(carouselState.index + 1, false), 3500);
+      }
+      function stopAutoplay() {
+        if (carouselState.timer) clearInterval(carouselState.timer);
+        carouselState.timer = null;
+      }
+      function restartAutoplay() {
+        autoplay();
+      }
+
+      // 首页：分类入口 & 热门推荐
+      function renderHome() {
+        const catWrap = $("#homeCats");
+        catWrap.innerHTML = "";
+        homeCats.forEach((c) => {
+          const el = document.createElement("div");
+          el.className = "cat";
+          el.innerHTML = `<div class="ico" aria-hidden="true">${c.icon}</div><span>${c.label}</span>`;
+          el.addEventListener("click", () => {
+            state.categoryPrimaryId = c.id;
+            setRoute("category");
+          });
+          catWrap.appendChild(el);
+        });
+
+        renderHotProducts();
+      }
+
+      function pickHotProducts() {
+        const shuffled = [...products].sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, 4);
+      }
+
+      function renderHotProducts() {
+        const grid = $("#hotGrid");
+        const hot = pickHotProducts();
+        grid.innerHTML = "";
+        hot.forEach((p) => grid.appendChild(productCard(p, { action: "addToCart" })));
+      }
+
+      function productCard(p, { action = "addToCart" } = {}) {
+        const el = document.createElement("div");
+        el.className = "p-card";
+        el.innerHTML = `
+          <div class="p-img"><img alt="${p.name}" src="${p.img}"/></div>
+          <div class="p-name">${p.name}</div>
+          <div class="p-meta">
+            <div class="price"><small>¥</small>${p.price}</div>
+            <button class="btn" data-act="${action}">加购</button>
+          </div>
+        `;
+        el.querySelector('[data-act="addToCart"]').addEventListener("click", (e) => {
+          e.stopPropagation();
+          addToCart(p.id);
+        });
+        el.addEventListener("click", () => {
+          // 原型：点击卡片也加购，便于演示
+          addToCart(p.id);
+        });
+        return el;
+      }
+
+      // 分类页
+      function renderCategory() {
+        const left = $("#primaryCats");
+        left.innerHTML = "";
+
+        primaryCats.forEach((c) => {
+          const b = document.createElement("button");
+          b.textContent = c.label;
+          b.setAttribute("aria-selected", String(c.id === state.categoryPrimaryId));
+          b.addEventListener("click", () => {
+            state.categoryPrimaryId = c.id;
+            renderCategory();
+          });
+          left.appendChild(b);
+        });
+
+        const active = primaryCats.find((c) => c.id === state.categoryPrimaryId) || primaryCats[0];
+        $("#catTitle").textContent = active.label;
+
+        const subs = $("#subCats");
+        subs.innerHTML = "";
+        active.subs.forEach((s) => {
+          const chip = document.createElement("div");
+          chip.className = "chip";
+          chip.textContent = s;
+          chip.addEventListener("click", () => {
+            // 原型：点击二级分类后，滚动到推荐商品区域
+            $("#screenScroll").scrollTo({ top: 120, behavior: "smooth" });
+          });
+          subs.appendChild(chip);
+        });
+
+        const list = products.filter((p) => p.primary === active.id).slice(0, 6);
+        $("#catCount").textContent = `${list.length}`;
+
+        const grid = $("#catProducts");
+        grid.innerHTML = "";
+        list.forEach((p) => grid.appendChild(productCard(p)));
+      }
+
+      function addToCart(productId) {
+        const p = products.find((x) => x.id === productId);
+        if (!p) return;
+        const existing = state.cart.find((c) => c.id === p.id);
+        if (existing) existing.qty += 1;
+        else state.cart.push({ id: p.id, name: p.name, spec: "默认规格", price: p.price, qty: 1, img: p.img });
+        if (state.route === "cart") renderCart();
+        toast(`已加入购物车：${p.name}`);
+      }
+
+      // 购物车页
+      function renderCart() {
+        const wrap = $("#cartList");
+        wrap.innerHTML = "";
+
+        if (state.cart.length === 0) {
+          const empty = document.createElement("div");
+          empty.className = "card";
+          empty.style.padding = "14px";
+          empty.innerHTML = `
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+              <div>
+                <strong style="font-size:13px;">购物车空空如也</strong>
+                <div style="margin-top:4px;color:rgba(255,255,255,.62);font-size:11px;">去分类页随便加点试试</div>
+              </div>
+              <button class="btn primary" id="toCategoryBtn">去分类</button>
+            </div>
+          `;
+          wrap.appendChild(empty);
+          $("#cartTotal").textContent = money(0);
+          $("#toCategoryBtn").addEventListener("click", () => setRoute("category"));
+          return;
+        }
+
+        state.cart.forEach((it) => {
+          const row = document.createElement("div");
+          row.className = "cart-item";
+          row.innerHTML = `
+            <div class="thumb"><img alt="${it.name}" src="${it.img}"/></div>
+            <div class="ci-main">
+              <div class="ci-title">
+                <strong>${it.name}</strong>
+                <button class="btn danger" data-del="${it.id}">删除</button>
+              </div>
+              <div class="ci-spec">${it.spec}</div>
+              <div class="ci-bottom">
+                <div class="price"><small>¥</small>${it.price}</div>
+                <div class="qty" aria-label="数量">
+                  <button aria-label="减少" data-dec="${it.id}">−</button>
+                  <span>${it.qty}</span>
+                  <button aria-label="增加" data-inc="${it.id}">+</button>
+                </div>
+              </div>
+            </div>
+          `;
+          wrap.appendChild(row);
+        });
+
+        // 绑定事件
+        $$("[data-inc]").forEach((b) =>
+          b.addEventListener("click", () => {
+            const id = b.getAttribute("data-inc");
+            const it = state.cart.find((x) => x.id === id);
+            if (!it) return;
+            it.qty += 1;
+            renderCart();
+          })
+        );
+        $$("[data-dec]").forEach((b) =>
+          b.addEventListener("click", () => {
+            const id = b.getAttribute("data-dec");
+            const it = state.cart.find((x) => x.id === id);
+            if (!it) return;
+            it.qty = Math.max(1, it.qty - 1);
+            renderCart();
+          })
+        );
+        $$("[data-del]").forEach((b) =>
+          b.addEventListener("click", () => {
+            const id = b.getAttribute("data-del");
+            state.cart = state.cart.filter((x) => x.id !== id);
+            renderCart();
+          })
+        );
+
+        const total = state.cart.reduce((sum, it) => sum + it.price * it.qty, 0);
+        $("#cartTotal").textContent = money(total);
+      }
+
+      // 订单页
+      function statusTag(status) {
+        const map = {
+          pending_pay: { text: "待付款", cls: "warn" },
+          pending_ship: { text: "待发货", cls: "brand" },
+          pending_receive: { text: "待收货", cls: "brand" },
+          done: { text: "已完成", cls: "ok" },
+        };
+        const v = map[status] || { text: "未知", cls: "muted" };
+        return `<span class="tag ${v.cls} dot">${v.text}</span>`;
+      }
+
+      function renderOrders() {
+        const tabs = $("#orderTabs");
+        tabs.innerHTML = "";
+        orderStatuses.forEach((s) => {
+          const t = document.createElement("button");
+          t.className = "tab";
+          t.textContent = s.label;
+          t.setAttribute("aria-selected", String(s.id === state.orderStatus));
+          t.addEventListener("click", () => {
+            state.orderStatus = s.id;
+            renderOrders();
+          });
+          tabs.appendChild(t);
+        });
+
+        // 长按/多状态原型：双击空白处恢复全部
+        tabs.title = "点击筛选状态；双击下方列表空白恢复全部";
+
+        const list = $("#orderList");
+        list.innerHTML = "";
+        const filtered = state.orderStatus === "all" ? orders : orders.filter((o) => o.status === state.orderStatus);
+
+        if (filtered.length === 0) {
+          const empty = document.createElement("div");
+          empty.className = "card";
+          empty.style.padding = "14px";
+          empty.innerHTML = `
+            <strong style="font-size:13px;">暂无该状态订单</strong>
+            <div style="margin-top:6px;color:rgba(255,255,255,.62);font-size:11px;">可切换状态查看其它订单</div>
+          `;
+          list.appendChild(empty);
+          return;
+        }
+
+        filtered.forEach((o) => {
+          const el = document.createElement("div");
+          el.className = "order";
+          const imgs = o.items.map((pid) => {
+            const p = products.find((x) => x.id === pid);
+            const src = p ? p.img : productImg(9);
+            return `<div class="mini"><img alt="" src="${src}"/></div>`;
+          }).join("");
+
+          el.innerHTML = `
+            <div class="order-head">
+              <div>
+                <div style="font-weight:700;font-size:12px;">订单号：${o.id}</div>
+                <small>${o.time}</small>
+              </div>
+              ${statusTag(o.status)}
+            </div>
+            <div class="order-items">${imgs}</div>
+            <div class="order-foot">
+              <strong>${money(o.amount)}</strong>
+              <button class="btn" data-rebuy="${o.id}">再买一次</button>
+            </div>
+          `;
+          list.appendChild(el);
+        });
+
+        $$("[data-rebuy]").forEach((b) =>
+          b.addEventListener("click", () => {
+            const id = b.getAttribute("data-rebuy");
+            const o = orders.find((x) => x.id === id);
+            if (!o) return;
+            o.items.forEach(addToCart);
+            setRoute("cart");
+          })
+        );
+
+        list.ondblclick = () => {
+          state.orderStatus = "all";
+          renderOrders();
+          toast("已恢复：全部订单");
+        };
+      }
+
+      // Toast（轻提示）
+      let toastTimer = null;
+      function toast(text) {
+        let el = $("#toast");
+        if (!el) {
+          el = document.createElement("div");
+          el.id = "toast";
+          el.style.position = "fixed";
+          el.style.left = "50%";
+          el.style.bottom = "24px";
+          el.style.transform = "translateX(-50%)";
+          el.style.padding = "10px 12px";
+          el.style.borderRadius = "14px";
+          el.style.background = "rgba(0,0,0,.55)";
+          el.style.border = "1px solid rgba(255,255,255,.18)";
+          el.style.color = "rgba(255,255,255,.92)";
+          el.style.fontSize = "12px";
+          el.style.backdropFilter = "blur(10px)";
+          el.style.boxShadow = "0 16px 40px rgba(0,0,0,.35)";
+          el.style.opacity = "0";
+          el.style.transition = "opacity .16s ease, transform .16s ease";
+          el.style.pointerEvents = "none";
+          document.body.appendChild(el);
+        }
+        el.textContent = text;
+        el.style.opacity = "1";
+        el.style.transform = "translateX(-50%) translateY(0)";
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          el.style.opacity = "0";
+          el.style.transform = "translateX(-50%) translateY(6px)";
+        }, 1600);
+      }
+
+      // 初始化绑定
+      function initNav() {
+        $$("#navList .nav-item").forEach((btn) => {
+          btn.addEventListener("click", () => setRoute(btn.dataset.route));
+        });
+      }
+
+      function initHomeActions() {
+        $("#goCategory").addEventListener("click", () => setRoute("category"));
+        $("#shuffleHot").addEventListener("click", () => {
+          renderHotProducts();
+          toast("已换一批推荐");
+        });
+      }
+
+      function initCarouselActions() {
+        $("#prevBtn").addEventListener("click", () => goSlide(carouselState.index - 1, true));
+        $("#nextBtn").addEventListener("click", () => goSlide(carouselState.index + 1, true));
+
+        const car = $("#carousel");
+        car.addEventListener("mouseenter", stopAutoplay);
+        car.addEventListener("mouseleave", autoplay);
+
+        // 移动端手势（简易）
+        let startX = 0;
+        let dx = 0;
+        car.addEventListener("touchstart", (e) => {
+          stopAutoplay();
+          startX = e.touches[0].clientX;
+          dx = 0;
+        }, { passive: true });
+        car.addEventListener("touchmove", (e) => {
+          dx = e.touches[0].clientX - startX;
+        }, { passive: true });
+        car.addEventListener("touchend", () => {
+          if (Math.abs(dx) > 40) goSlide(carouselState.index + (dx < 0 ? 1 : -1), true);
+          restartAutoplay();
+        });
+      }
+
+      function initCategoryActions() {
+        $("#addRandomToCart").addEventListener("click", () => {
+          const active = state.categoryPrimaryId;
+          const list = products.filter((p) => p.primary === active);
+          const p = list[Math.floor(Math.random() * list.length)];
+          if (p) addToCart(p.id);
+        });
+      }
+
+      function initCartActions() {
+        $("#checkoutBtn").addEventListener("click", () => {
+          const total = state.cart.reduce((sum, it) => sum + it.price * it.qty, 0);
+          if (total <= 0) {
+            toast("购物车为空");
+            return;
+          }
+          toast(`已模拟结算：${money(total)}（原型演示）`);
+        });
+      }
+
+      function initProfile() {
+        // 原型：随机昵称/头像字母，方便多次刷新看到变化
+        const names = ["云上买买", "折扣雷达", "橙子同学", "小鹿选品", "北极星会员"];
+        const name = names[Math.floor(Math.random() * names.length)];
+        $("#nickname").textContent = name;
+        $("#avatar").textContent = name.slice(0, 1);
+        $("#couponCount").textContent = `${Math.floor(3 + Math.random() * 10)} 张`;
+      }
+
+      function initSearchHint() {
+        $("#searchInput").addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            toast("搜索仅做展示：可接入真实数据");
+          }
+        });
+      }
+
+      function initStatusbarClock() {
+        const el = $("#sbTime");
+        el.textContent = nowTimeText();
+        setInterval(() => (el.textContent = nowTimeText()), 15 * 1000);
+      }
+
+      function bootstrap() {
+        initNav();
+        initStatusbarClock();
+        initSearchHint();
+
+        renderCarousel();
+        initCarouselActions();
+        autoplay();
+
+        renderHome();
+        initHomeActions();
+
+        renderCategory();
+        initCategoryActions();
+
+        renderCart();
+        initCartActions();
+
+        // 订单页默认展示“全部”，但 tabs 只展示 4 个状态（更像 App）
+        state.orderStatus = "all";
+        renderOrders();
+
+        initProfile();
+
+        // 初始 route
+        setRoute("home");
+      }
+
+      bootstrap();
+    </script>
+  </body>
+</html>
+
